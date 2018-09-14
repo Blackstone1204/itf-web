@@ -3,9 +3,7 @@
     <el-form :model="xmodel" v-if="xmodel" size="mini">
       <el-form-item label-width="100px" :label="keymap[key]" v-for="key,index in getKeys(xmodel)" :key="key">
 
-        <paramInfo v-if="key==='paramInfo'"></paramInfo>
-
-        <el-radio-group v-else-if="key==='method'" v-model="radio" >
+        <el-radio-group v-if="key==='method'" v-model="radio" >
           <el-radio-button label="get"></el-radio-button>
           <el-radio-button label="post"></el-radio-button>
           <el-radio-button label="put"></el-radio-button>
@@ -13,6 +11,18 @@
         </el-radio-group>
 
         <el-input v-model="xmodel[key]" :key="index" clearable v-else></el-input>
+      </el-form-item>
+
+      <el-form-item label="参数信息" label-width="100px">
+       <paramInfo  ref="params"></paramInfo>
+      </el-form-item>
+
+      <el-form-item label="前置信息" label-width="100px">
+         <directiveBefore ref="before"></directiveBefore>
+      </el-form-item>
+
+      <el-form-item label="后置信息" label-width="100px">
+         <directiveAfter ref="after"></directiveAfter>
       </el-form-item>
 
     </el-form>
@@ -25,8 +35,10 @@
 </template>
 <script type="text/javascript">
 import paramInfo from './ParamInfo'
+import directiveBefore from './Before'
+import directiveAfter from './After'
 export default {
-  components:{paramInfo},
+  components:{paramInfo,directiveBefore,directiveAfter},
   data() {
     return {
       radio:'post',
@@ -37,10 +49,10 @@ export default {
         'title': '',
         //'author':localStorage.getItem("userName"),
         'url': '',
-        'method': '',
-        'paramInfo': '',
-        'a': '',
-        'b': ''
+        'method': ''
+  
+        // 'a': '',
+        // 'b': ''
         // 'author': '',
         // 'accontId':'',
         // 'parentId':'',
@@ -50,10 +62,8 @@ export default {
       keymap: {
         'title': "名称",
         'url': '接口地址',
-        'method': '请求方式',
-        'paramInfo': '参数信息',
-        'a': '前置条件',
-        'b': '后置条件'
+        'method': '请求方式'
+    
       }
 
     }
@@ -122,6 +132,7 @@ export default {
     submit() {
 
       let self = this
+      //console.log("获取前置信息=>"+JSON.stringify(self.$refs.before.directiveInfo))
       console.log("submit" + JSON.stringify(this.xmodel));
       if (typeof(this.onSubmit) === 'Function') this.onSubmit(this.xmodel)
 
@@ -140,33 +151,48 @@ export default {
 
       }
 
+      let next = function(res){
 
-      let next = function(res) {
+        console.log(self.$refs)
 
-        //调paramInfo接口
-        let paramInfo={
-          'targetId':res.data.data,
-          'key':'',
-          'value':''
-        }
-        self.$post("/api/paramInfo/add",[paramInfo],function(){})
+        //调paramInfo接口 默认无效数据 需要 服务端处理 
+        let list1=self.$refs.params.kv
+        console.log("填写的参数信息=>"+JSON.stringify(list1))
+        let params=[]
 
-        //调用directive接口
-        let directiveBefore={
-          'targetId':res.data.data,
-          'type':'0',
-          'info':self.a
-        }
-        let directiveAfter={
-          'targetId':res.data.data,
-          'type':'1',
-          'info':self.b
-        }
+        list1.forEach(function(item){
+          params.push({
+            'targetId':res.data.data,
+            'k':item.k,
+            'v':item.v
+          })
+
+        })
+
+
+        
+
+        self.$post("/api/paramInfo/add",params)
+
+        //调用directive接口  无效数据需要服务端处理
+        //console.log("获取前置信息=>"+JSON.stringify(self.$refs.before.directiveInfo))
+        const list2=self.$refs.after.directiveInfo.concat(self.$refs.before.directiveInfo)
+        console.log("填写的指令信息=>"+JSON.stringify(list2))
 
         let directives=[]
-        directives.push(directiveBefore)
-        directives.push(directiveAfter)
-        self.$post("/api/directive/add",directives,function(){})
+
+        list2.forEach(function(item){
+          directives.push({
+            'targetId':res.data.data,
+            'type':item.type,
+            'info':item.info,
+            'sequence':item.sequence
+          })
+        })
+ 
+
+
+        self.$post("/api/directive/add",directives)
 
        //会有坑
         self.$store.commit("updateTreeData")
@@ -176,10 +202,11 @@ export default {
           'type': 'success'
         })
 
-        console.log("新增node " + JSON.stringify(newChild))
+        // console.log("新增node " + JSON.stringify(newChild))
 
 
       }
+
 
       this.$post("/api/target/add", target, next)
 
@@ -228,6 +255,10 @@ export default {
 
   created() {
     //console.log("11" + JSON.stringify(this.ext))
+  },
+  mounted(){
+    console.log("addcase page mounted!")
+    //console.log(this)
   }
 
 

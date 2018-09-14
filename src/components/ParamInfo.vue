@@ -17,12 +17,14 @@
 
     </el-radio-group> -->
     <el-input v-show="radio==='raw'" v-model="textarea" :rows='5' type="textarea" style="margin-top: 10px;" placeHolder="请输入文本内容"></el-input>
+
     <div id="k-v" style="margin-top: 10px;" v-show="radio=='k/v'" v-for="item,index in kv">
-      <el-input placeHolder="key" style="width:100px;" v-model="item.key"></el-input>
-      <el-input style="width:100px;margin-left: 10px;" placeHolder='value' v-model="item.value"></el-input>
+      <el-input placeHolder="key" style="width:100px;" v-model="item.k"></el-input>
+      <el-input style="width:100px;margin-left: 10px;" placeHolder='value' v-model="item.v"></el-input>
       <span class="el-icon-circle-plus" style="margin-left: 10px;" @click="add"></span>
       <span class="el-icon-remove-outline" style="margin-left: 10px;" @click="reduce(index)"></span>
     </div>
+
     <div id="file" v-show="radio==='file'">
       <el-upload class="upload-demo" drag action="https://jsonplaceholder.typicode.com/posts/" multiple style="margin-top:10px;">
         <i class="el-icon-upload"></i>
@@ -41,15 +43,20 @@ export default {
       radio3: 'www-form-urlencode',
       textarea: '',
       kv: [{
-        key: '',
-        value: ''
+        k: '',
+        v: ''
 
       }]
     }
   },
   methods: {
     add() {
-      this.kv.push({});
+      this.kv.push(
+        {
+        k: '',
+        v: ''
+
+      });
     },
     reduce(index) {
       this.kv.splice(index, 1);

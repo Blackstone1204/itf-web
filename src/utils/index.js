@@ -14,7 +14,7 @@ let setToken = function(token) {
 }
 let ajax = function(url, data, method, next, doerror) {
 
-  console.log("[" + method + "]" + JSON.stringify(data) + " token=" + access_token + " -> " + url)
+  console.log("[" + method + "]" + JSON.stringify(data) + " token=" +store.state.accessToken  + " -> " + url)
 
   axios({
     method: method,
@@ -28,9 +28,6 @@ let ajax = function(url, data, method, next, doerror) {
   }).then(function(res) {
     console.log(res.status + "->" + JSON.stringify(res.data))
 
-
-
-
     //正常请求
 
     if (res.data.access_token) {
@@ -40,16 +37,23 @@ let ajax = function(url, data, method, next, doerror) {
 
     }
 
-    next(res)
+    
+    if(typeof(next)==='function')next(res);
+    else console.log(typeof(next));
 
 
 
   }).catch(function(error) {
 
-    console.log("请求异常 ->" + JSON.stringify(error))
+    console.error(error)
+
+    console.error("请求异常 ->" + JSON.stringify(error))
     //accessToken 过期或请求异常处理 清除状态和localstorage
 
     if (error.response) {
+
+       const status = error.response.status
+
       if (status === 401) {
         store.state.isLogin = "0"
         store.state.userName = "未登录"
@@ -58,7 +62,7 @@ let ajax = function(url, data, method, next, doerror) {
         Message.info("请重新登录  -> token过期错误")
 
       } else {
-        const status = error.response.status
+       
         const url = error.config.url
         const method = error.config.method
 
@@ -70,11 +74,14 @@ let ajax = function(url, data, method, next, doerror) {
     } else {
 
 
-      if(store.state.isLogin==='1')
+      if(store.state.isLogin==='1'&&error.config.timeout){
         Message.info("请重新登录->session过期-> ")
-      store.state.isLogin = "0"
-      store.state.userName = "未登录"
-      store.state.accessToken = ''
+        store.state.isLogin = "0"
+        store.state.userName = "未登录"
+        store.state.accessToken = ''
+
+      }
+
 
 
 

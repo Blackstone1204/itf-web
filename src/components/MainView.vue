@@ -116,6 +116,8 @@ export default {
 
     appendFolder(node, data) {
 
+      self=this
+
       console.log("开始新建目录=>" + JSON.stringify(data))
 
       this.$prompt("名称", '新建目录', {
@@ -133,10 +135,19 @@ export default {
 
           }
 
-          this.$post("/api/target/add", target)
+          this.$post("/api/target/add", target,function(){
+
+            self.$message({
+              'message': '新增目录'+value,
+              'type': 'success'
+            })
+
+            self.$store.commit("updateTreeData")
+          })
+       
 
         })
-        .catch(() => {
+        .catch((value) => {
 
           this.$message({
             type: 'error',
