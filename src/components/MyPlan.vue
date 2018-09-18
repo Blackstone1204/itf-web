@@ -17,18 +17,20 @@
       <template slot-scope="scope">
         <span
           size="mini"
-          @click="up(scope.$index)" class="iconfont icon-up-square"></span>
+          @click="up(scope.$index)" class="iconfont icon-arrowup"></span>
         <span
           size="mini"
-          @click="down(scope.$index)" class="iconfont icon-down-square"></span>
+          @click="down(scope.$index)" class="iconfont icon-arrowdown"></span>
+
+        <span
+          size="mini"
+          @click="down(scope.$index)" class="iconfont icon-edit-square"></span>
 
         <span
           size="mini"
           @click="down(scope.$index)" class="iconfont icon-delete"></span>
 
-        <span
-          size="mini"
-          @click="down(scope.$index)" class="iconfont icon-edit-square"></span>
+
       </template>
     </el-table-column>
     </el-table>

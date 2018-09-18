@@ -60,6 +60,13 @@ export default {
     },
     reduce(index) {
       this.kv.splice(index, 1);
+    },
+    reset(){
+      this.kv= [{
+        'k': '',
+        'v': ''
+
+      }]
     }
   }
 }

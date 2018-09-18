@@ -1,6 +1,6 @@
 <template>
   <div id="mainView">
-    <el-container>
+    <el-container >
       <el-header>
         <info></info>
       </el-header>
@@ -8,9 +8,9 @@
         <el-aside width="250px" style="float: left">
           <el-input placeholder="搜索用例" v-model="filterText" size='mini'>
           </el-input>
-          <el-tree node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
+          <el-tree  node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
             <span class="custom-tree-node " slot-scope="{ node, data }" @mouseover="mouseover(node,data)">
-            
+            <span>{{node.label}}</span>
             <span :class="{
             'iconfont icon-folder-fill':data.method==''||data.method==null,
             // 'folder-class':data.isDir=='1',
@@ -18,14 +18,16 @@
             'post-class':data.method=='post',
             'put-class':data.method=='put',
             'delete-class':data.method=='delete'
-            }" >{{node.label}}</span>
+            }" >{{getMethod(data)}}</span>
+   
             <span class="tool">
           <span class="iconfont icon-folder-add"
             type="text"
             size="mini"
+            v-if="data.isDir=='1'"
             @click="() => appendFolder(node,data)">
           </span>
-            <span class="iconfont icon-file-text" type="text" size="mini" @click="() => append(node,data)">
+            <span  v-if="data.isDir=='1'" class="iconfont icon-file-text" type="text" size="mini" @click="() => append(node,data)">
           </span>
             <span class="iconfont icon-edit-square" v-show="data.parentId!=-1" type="text" size="mini" @click="() => update(data)">
           </span>
@@ -36,11 +38,8 @@
             @click="() => remove(node, data)">
             Delete
           </el-button> -->
-            <span class="iconfont icon-delete" v-show="data.parentId!=-1" type="text" size="mini" @click="() => remove(node, data)">
-            
-          </span>
-            <span class="iconfont icon-int" type="text" size="mini" @click="() => box(node, data)">
-          </span>
+            <span class="iconfont icon-delete" v-show="data.parentId!=-1" type="text" size="mini" @click="() => remove(node, data)"></span>
+            <span class="iconfont icon-check" type="text" size="mini" @click="() => box(node, data)"></span>
             </span>
             </span>
           </el-tree>
@@ -51,7 +50,7 @@
       </el-container>
     </el-container>
     <addCaseDialog @onClose="onClose" :show="isShow" :ext="ext1"></addCaseDialog>
-    <updateCaseDialog @onClose_1="onClose_1" :show="isShow_1" :ext="ext1"></updateCaseDialog>
+    <updateCaseDialog @onClose_1="onClose_1" :show="isShow_1" :ext="ext1" :key="new Date().getTime()"></updateCaseDialog>
     <delCaseDialog @onClose_2="onClose_2" :show="isShow_2" :ext1="ext1" :ext2="ext2" message="你确认要删除该用例么?"></delCaseDialog>
   </div>
 </template>
@@ -61,7 +60,7 @@ import addCaseDialog from './AddCaseDialog'
 import updateCaseDialog from './UpdateCaseDialog'
 import delCaseDialog from './DelCaseDialog'
 import myCard from './MyCard'
-
+import { Loading } from 'element-ui';
 export default {
 
   components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard },
@@ -74,7 +73,6 @@ export default {
   data: function() {
     return {
       h: '200px',
-
       filterText: "",
 
       props: {
@@ -95,6 +93,12 @@ export default {
     /***
      *****
      **/
+    getMethod(data){
+      if(!data.method)return '';
+
+      return data.method.substring(0,6)
+
+    },
     handleNodeExpand(data, node, component) {
 
       this.$store.commit("addTreeExpandKeys", data.id)
@@ -169,8 +173,52 @@ export default {
 
     },
     update(data) {
-      this.isShow_1 = true
-      this.ext1 = data
+      let self=this
+      var method=data.method
+      if(method){
+        this.isShow_1 = true;
+        this.ext1 =data;
+      }else{
+
+          this.$prompt("名称", '编辑目录', {
+          inputPattern: /^[\u4e00-\u9fa5_a-zA-Z0-9]{1,20}$/,
+          inputErrorMessage: '名称不正确'
+        })
+        .then(({ value }) => {
+
+          let target = {
+            id:data.id,
+            title: value,
+            accountId: localStorage.getItem("accountId"),
+            parentId: data.parentId,
+            isDir: '1',
+            isDelete:'0'
+
+          }
+
+          self.$post("/api/target/update", target,function(){
+
+            self.$message({
+              'message': '修改目录'+value,
+              'type': 'success'
+            })
+
+            self.$store.commit("updateTreeData")
+          })
+       
+
+        })
+        .catch((value) => {
+
+          self.$message({
+            type: 'error',
+            message: '修改目录失败=>' + value
+          })
+
+        })
+
+      }
+
 
 
     },
@@ -218,6 +266,8 @@ export default {
   mounted: function() {
 
     console.log("mainView.vue page mounted")
+
+    // let loadingInstance1 = Loading.service({ fullscreen: true });
 
     this.$store.commit("updateTreeData")
     //停止特效

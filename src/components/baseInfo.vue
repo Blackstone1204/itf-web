@@ -14,6 +14,7 @@
     <span class="iconfont icon-adduser" style="float:right;margin-top:10px;margin-right:20px;" @click='actManager'></span>
     
     <span class="iconfont icon-team"  style="float:right;margin-top:10px;margin-right:20px;" @click='authManager'></span>
+    <span class="iconfont icon-plus"  style="float:right;margin-top:10px;margin-right:20px;" @click='authManager'></span>
 
     <vm :show='isShow' @onClose='onClose'></vm>
     <am :show='isShow2' @onClose='onClose2'></am>

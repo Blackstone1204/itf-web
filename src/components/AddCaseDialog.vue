@@ -1,16 +1,13 @@
 <template>
   <el-dialog title="新建用例" :visible.sync="isShow" :before-close="close">
     <el-form :model="xmodel" v-if="xmodel" size="mini">
-      <el-form-item label-width="100px" :label="keymap[key]" v-for="key,index in getKeys(xmodel)" :key="key">
+      <el-form-item label-width="100px" :label="keymap[key]" v-for="key,index in getKeys(xmodel)" :key="key" >
 
-        <el-radio-group v-if="key==='method'" v-model="radio" >
-          <el-radio-button label="get"></el-radio-button>
-          <el-radio-button label="post"></el-radio-button>
-          <el-radio-button label="put"></el-radio-button>
-          <el-radio-button label="delete"></el-radio-button>
-        </el-radio-group>
+        <el-input v-model="xmodel[key]" :key="index" clearable></el-input>
+      </el-form-item>
 
-        <el-input v-model="xmodel[key]" :key="index" clearable v-else></el-input>
+      <el-form-item label="请求方式" label-width="100px">
+         <method  ref="method" :key="new Date().getTime()"></method>
       </el-form-item>
 
       <el-form-item label="参数信息" label-width="100px">
@@ -37,32 +34,20 @@
 import paramInfo from './ParamInfo'
 import directiveBefore from './Before'
 import directiveAfter from './After'
+import method from './MethodInfo'
 export default {
-  components:{paramInfo,directiveBefore,directiveAfter},
+  components:{paramInfo,directiveBefore,directiveAfter,method},
   data() {
     return {
-      radio:'post',
       isShow: this.show,
       xmodel: {
-        // 'id':'',
 
         'title': '',
-        //'author':localStorage.getItem("userName"),
-        'url': '',
-        'method': ''
-  
-        // 'a': '',
-        // 'b': ''
-        // 'author': '',
-        // 'accontId':'',
-        // 'parentId':'',
-        // 'domain':'',
-        // 'lev':''
+        'url': ''
       },
       keymap: {
         'title': "名称",
-        'url': '接口地址',
-        'method': '请求方式'
+        'url': '接口地址'
     
       }
 
@@ -70,9 +55,6 @@ export default {
   },
 
   props: {
-
-    //
-
     //
     show: {
       type: Boolean
@@ -99,8 +81,6 @@ export default {
     onCancle: {
       type: Function
     }
-
-
 
   },
 
@@ -132,22 +112,25 @@ export default {
     submit() {
 
       let self = this
-      //console.log("获取前置信息=>"+JSON.stringify(self.$refs.before.directiveInfo))
-      console.log("submit" + JSON.stringify(this.xmodel));
+      // console.log(self.$refs)
+      // console.log("submit" + JSON.stringify(this.xmodel));
       if (typeof(this.onSubmit) === 'Function') this.onSubmit(this.xmodel)
 
       // 调target接口
+
+      const method=self.$refs.method.radio
+
+      // console.log("mehod=>"+JSON.stringify(self))
 
       let target = {
 
         title: this.xmodel.title,
         url: this.xmodel.url,
+        method:method,
         accountId: localStorage.getItem("accountId"),
         parentId: this.ext.id,
-        domain: this.xmodel.domain,
-        lev: this.xmodel.lev,
-        isDir:'0',
-        method:this.radio
+        isDir:'0'
+      
 
       }
 
@@ -158,13 +141,13 @@ export default {
         //调paramInfo接口 默认无效数据 需要 服务端处理 
         let list1=self.$refs.params.kv
         console.log("填写的参数信息=>"+JSON.stringify(list1))
-        let params=[]
+        let paramInfo=[]
 
         list1.forEach(function(item){
-          params.push({
-            'targetId':res.data.data,
-            'k':item.k,
-            'v':item.v
+          paramInfo.push({
+            targetId:res.data.data,
+            k:item.k,
+            v:item.v
           })
 
         })
@@ -172,7 +155,7 @@ export default {
 
         
 
-        self.$post("/api/paramInfo/add",params)
+        self.$post("/api/paramInfo/add",paramInfo)
 
         //调用directive接口  无效数据需要服务端处理
         //console.log("获取前置信息=>"+JSON.stringify(self.$refs.before.directiveInfo))
@@ -186,7 +169,7 @@ export default {
             'targetId':res.data.data,
             'type':item.type,
             'info':item.info,
-            'sequence':item.sequence
+            'sequence':item.sequence+''
           })
         })
  
@@ -201,6 +184,12 @@ export default {
           'message': '新增用例成功',
           'type': 'success'
         })
+
+
+        //重置参数和指令信息
+        self.$refs.after.reset()
+        self.$refs.before.reset()
+        self.$refs.params.reset()
 
         // console.log("新增node " + JSON.stringify(newChild))
 
