@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <el-scrollbar class="el-scrollbar"> -->
-    <el-card class="box-card" v-for="n in 20 " shadow="hover" :key="n">
+    <el-card class="box-card" v-for="plan in plans " shadow="hover" :key="n">
       <div slot="header" class="clearfix">
         <span>
           <span class="pass">pass:4</span><span class="error">error:5</span><span class="total">total:9</span>
@@ -13,7 +13,7 @@
       </div>
       <div class="bottom">
 
-        <span class="plan_name">计划_{{n}}</span> 
+        <span class="plan_name">计划_{{plan.name}}</span> 
 
         <span @click="del" class="plan-icon iconfont icon-delete" style="float: right;margin-right: 5px;"></span>
         <span @click='update' class="plan-icon iconfont icon-edit-square" style="float: right;margin-right: 5px;"></span>
@@ -40,7 +40,8 @@ export default {
   components: { MyPlan },
   data() {
     return {
-      isShow: false
+      isShow: false,
+      plans:[]
     }
 
   },
@@ -84,6 +85,18 @@ export default {
       this.isShow = false
 
     }
+  },
+  mounted:function(){
+    let self=this
+
+
+    let next=function(res){
+      //alert(res.data.data)
+      self.plans=res.data.data
+      
+
+    }
+    this.$get("/api/plan/queryAll",{},next)
   }
 
 

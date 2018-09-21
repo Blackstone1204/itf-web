@@ -118,8 +118,23 @@ export default {
       this.isShow = true
     },
     submitRole() {
+      let self=this
       this.closeRole()
       this.isShow = true
+      let next=function(res){
+        if(res.data.code===1)
+          self.$message({
+            type:'success',
+            message:'添加角色'+self.role.name+"成功"
+          })
+
+      }
+      let entity={
+        name:role.name,
+        // canReadSelf:this.mauth.canReadSelf==true?
+
+      }
+     // this.$post("/api/role/add",entity,next)
     },
     getBoolean(v){
     	if(v==='1')return true

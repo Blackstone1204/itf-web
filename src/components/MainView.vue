@@ -10,7 +10,7 @@
           </el-input>
           <el-tree  node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
             <span class="custom-tree-node " slot-scope="{ node, data }" @mouseover="mouseover(node,data)">
-            <span>{{node.label}}</span>
+         
             <span :class="{
             'iconfont icon-folder-fill':data.method==''||data.method==null,
             // 'folder-class':data.isDir=='1',
@@ -19,6 +19,8 @@
             'put-class':data.method=='put',
             'delete-class':data.method=='delete'
             }" >{{getMethod(data)}}</span>
+
+            <span>{{node.label}}</span>
    
             <span class="tool">
           <span class="iconfont icon-folder-add"
@@ -40,6 +42,7 @@
           </el-button> -->
             <span class="iconfont icon-delete" v-show="data.parentId!=-1" type="text" size="mini" @click="() => remove(node, data)"></span>
             <span class="iconfont icon-check" type="text" size="mini" @click="() => box(node, data)"></span>
+            <ps key="planSelector" ref='planSelector' :ext="ext"></ps>
             </span>
             </span>
           </el-tree>
@@ -61,9 +64,10 @@ import updateCaseDialog from './UpdateCaseDialog'
 import delCaseDialog from './DelCaseDialog'
 import myCard from './MyCard'
 import { Loading } from 'element-ui';
+import ps from './PlanSelector'
 export default {
 
-  components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard },
+  components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard,ps},
   watch: {
     filterText: function(val) {
       this.$refs.tree.filter(val);
@@ -83,6 +87,7 @@ export default {
       isShow: false,
       isShow_1: false,
       isShow_2: false,
+      ext:{},
       ext1: {},
       ext2: {}
 
@@ -239,6 +244,14 @@ export default {
 
     },
     box(node, data) {
+      this.ext=data
+      let next=function(res){
+        const count=res.data.data
+        console.log("current plan size=>"+count)
+
+      }
+      this.$get("/api/plan/queryCount",{},next)
+      this.$refs.planSelector.isShow=true
 
     },
     mouseover(node, data) {

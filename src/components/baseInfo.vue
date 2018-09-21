@@ -14,24 +14,27 @@
     <span class="iconfont icon-adduser" style="float:right;margin-top:10px;margin-right:20px;" @click='actManager'></span>
     
     <span class="iconfont icon-team"  style="float:right;margin-top:10px;margin-right:20px;" @click='authManager'></span>
-    <span class="iconfont icon-plus"  style="float:right;margin-top:10px;margin-right:20px;" @click='authManager'></span>
+    <span class="iconfont icon-plus"  style="float:right;margin-top:10px;margin-right:20px;" @click='addPlan'></span>
 
     <vm :show='isShow' @onClose='onClose'></vm>
     <am :show='isShow2' @onClose='onClose2'></am>
     <act :show="isShow3" @onClose="onClose3"></act>
+    <pl :show="isShow4" @onClose="onClose4"></pl>
   </div>
 </template>
 <script type="text/javascript">
 import vm from './Variables'
 import am from './Auth'
 import  act from './Account'
+import pl from './PlanAdd'
 export default {
-  components: { vm,am,act},
+  components: { vm,am,act,pl},
   data() {
     return {
       isShow: false,
       isShow2:false,
       isShow3:false,
+      isShow4:false,
       value: '',
       options:[]
     }
@@ -58,6 +61,11 @@ export default {
       this.isShow3=true
 
     },
+    addPlan(){
+      this.isShow4=true
+      console.log("addPlan")
+
+    },
     onClose(show) {
       this.isShow = show
     },
@@ -67,6 +75,11 @@ export default {
     },
     onClose3(show){
       this.isShow3=show
+    },
+    onClose4(show){
+
+      this.isShow4=show
+
     }
   },
 
