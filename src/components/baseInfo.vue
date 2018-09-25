@@ -20,6 +20,8 @@
     <am :show='isShow2' @onClose='onClose2'></am>
     <act :show="isShow3" @onClose="onClose3"></act>
     <pl :show="isShow4" @onClose="onClose4"></pl>
+
+
   </div>
 </template>
 <script type="text/javascript">

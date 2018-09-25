@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <el-scrollbar class="el-scrollbar"> -->
-    <el-card class="box-card" v-for="plan in plans " shadow="hover" :key="n">
+    <el-card class="box-card" v-for="plan in plans " shadow="hover" :key="plan.name">
       <div slot="header" class="clearfix">
         <span>
           <span class="pass">pass:4</span><span class="error">error:5</span><span class="total">total:9</span>
@@ -9,17 +9,13 @@
       </div>
       <div>
         <el-progress type='circle' :percentage='35' color='#67c23a'></el-progress>
-    
       </div>
       <div class="bottom">
-
-        <span class="plan_name">计划_{{plan.name}}</span> 
-
+        <span class="plan_name">计划_{{plan.name}}</span>
         <span @click="del" class="plan-icon iconfont icon-delete" style="float: right;margin-right: 5px;"></span>
         <span @click='update' class="plan-icon iconfont icon-edit-square" style="float: right;margin-right: 5px;"></span>
-        <span @click='viewHistory' class="plan-icon iconfont icon-linechart" style="float: right;margin-right: 5px;"></span>
+        <span @click='view' class="plan-icon iconfont icon-linechart" style="float: right;margin-right: 5px;"></span>
         <span @click='run' class="plan-icon iconfont icon-play-circle-fill" style="float: right;margin-right: 5px;"></span>
-
       </div>
     </el-card>
     <!-- </el-scrollbar> -->
@@ -28,41 +24,43 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancle">取 消</el-button>
         <el-button type="primary" @click="submit">确 定</el-button>
-
       </div>
     </el-dialog>
+
+    <mychartDialog :show="isShow_1"></mychartDialog>
   </div>
 </template>
 <script type="text/javascript">
 import MyPlan from './MyPlan'
-
+import mychartDialog from './chart'
 export default {
-  components: { MyPlan },
+  components: { MyPlan,mychartDialog },
   data() {
     return {
       isShow: false,
-      plans:[]
+      isShow_1:false,
+      plans: []
     }
 
   },
 
   methods: {
-    submit(){
-      self=this
-  
-      let da=this.$refs.plan.$data.plan
-      let next=function(){
+    submit() {
+      self = this
 
-        self.isShow=false
+      let da = this.$refs.plan.$data.plan
+      let next = function() {
+
+        self.isShow = false
 
       }
       console.log(da)
 
 
-      this.$post('/api/plan/update',da,next)
+      this.$post('/api/plan/update', da, next)
 
     },
-    cancle(){
+    cancle() {
       this.isShow = false
 
     },
@@ -71,13 +69,14 @@ export default {
       this.isShow = true
 
     },
-    del(){
+    del() {
 
     },
-    run(){
+    run() {
 
     },
-    viewHistory(){
+    view() {
+      this.isShow_1=true;
 
     },
     close() {
@@ -86,17 +85,17 @@ export default {
 
     }
   },
-  mounted:function(){
-    let self=this
+  mounted: function() {
+    let self = this
 
 
-    let next=function(res){
+    let next = function(res) {
       //alert(res.data.data)
-      self.plans=res.data.data
-      
+      self.plans = res.data.data
+
 
     }
-    this.$get("/api/plan/queryAll",{},next)
+    this.$get("/api/plan/queryAll", {}, next)
   }
 
 
@@ -133,26 +132,29 @@ export default {
   margin-bottom: 20px;
 }
 
-.plan-icon:hover{
-  color:#67C23A;
-  font-weight:bold;
+.plan-icon:hover {
+  color: #67C23A;
+  font-weight: bold;
+}
 
+.pass {
+  color: #67C23A;
 }
-.pass{
-  color:#67C23A;
+
+.total {
+  color: #409EFF;
+  margin-left: 10px;
 }
-.total{
-  color:#409EFF;
-  margin-left:10px;
+
+.error {
+  color: #F56C6C;
+  margin-left: 10px;
 }
-.error{
-  color:#F56C6C; 
-  margin-left:10px;
-}
-.plan_name{
+
+.plan_name {
   color: #606266;
   font-weight: bold;
-  font-family:"Microsoft YaHei";
+  font-family: "Microsoft YaHei";
 }
 
 </style>

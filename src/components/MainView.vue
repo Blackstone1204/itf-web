@@ -55,6 +55,7 @@
     <addCaseDialog @onClose="onClose" :show="isShow" :ext="ext1"></addCaseDialog>
     <updateCaseDialog @onClose_1="onClose_1" :show="isShow_1" :ext="ext1" :key="new Date().getTime()"></updateCaseDialog>
     <delCaseDialog @onClose_2="onClose_2" :show="isShow_2" :ext1="ext1" :ext2="ext2" message="你确认要删除该用例么?"></delCaseDialog>
+
   </div>
 </template>
 <script type="text/javascript">
@@ -65,6 +66,7 @@ import delCaseDialog from './DelCaseDialog'
 import myCard from './MyCard'
 import { Loading } from 'element-ui';
 import ps from './PlanSelector'
+import mychartDialog from './chart'
 export default {
 
   components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard,ps},

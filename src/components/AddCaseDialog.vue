@@ -120,7 +120,9 @@ export default {
 
       const method=self.$refs.method.radio
 
-      // console.log("mehod=>"+JSON.stringify(self))
+      //console.log("mehod=>"+JSON.stringify(self))
+      const type=this.$refs.params.type
+      console.log("type=>"+type)
 
       let target = {
 
@@ -129,7 +131,8 @@ export default {
         method:method,
         accountId: localStorage.getItem("accountId"),
         parentId: this.ext.id,
-        isDir:'0'
+        isDir:'0',
+        contentType:type
       
 
       }

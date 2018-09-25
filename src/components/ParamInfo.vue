@@ -40,7 +40,7 @@ export default {
     return {
       radio: "k/v",
       radio2: "json",
-      radio3: 'www-form-urlencode',
+      type:"kv",
       textarea: '',
       kv: [{
         k: '',
@@ -67,6 +67,17 @@ export default {
         'v': ''
 
       }]
+    }
+  },
+  watch:{
+    radio:function(){
+      if(this.radio==='k/v')this.type='kv';
+      else this.type=this.radio2;
+
+    },
+    radio2:function(){
+      this.type=this.radio2
+
     }
   }
 }
