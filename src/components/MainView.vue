@@ -1,6 +1,6 @@
 <template>
   <div id="mainView">
-    <el-container >
+    <el-container>
       <el-header>
         <info></info>
       </el-header>
@@ -8,20 +8,21 @@
         <el-aside width="250px" style="float: left">
           <el-input placeholder="搜索用例" v-model="filterText" size='mini'>
           </el-input>
-          <el-tree  node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
+          <el-tree node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
             <span class="custom-tree-node " slot-scope="{ node, data }" @mouseover="mouseover(node,data)">
-         
-            <span :class="{
+
+            <!-- <span v-if="data.method==''||data.method==null" class="iconfont icon-folder-fill" ></span> -->
+            <span  class='method' :class="{
             'iconfont icon-folder-fill':data.method==''||data.method==null,
             // 'folder-class':data.isDir=='1',
             'get-class':data.method=='get',
             'post-class':data.method=='post',
             'put-class':data.method=='put',
             'delete-class':data.method=='delete'
-            }" >{{getMethod(data)}}</span>
+            }" v-html="getMethod(data)">
 
-            <span>{{node.label}}</span>
-   
+          </span>
+            <span style="padding:0">{{node.label}}</span>
             <span class="tool">
           <span class="iconfont icon-folder-add"
             type="text"
@@ -29,7 +30,7 @@
             v-if="data.isDir=='1'"
             @click="() => appendFolder(node,data)">
           </span>
-            <span  v-if="data.isDir=='1'" class="iconfont icon-file-text" type="text" size="mini" @click="() => append(node,data)">
+            <span v-if="data.isDir=='1'" class="iconfont icon-file-text" type="text" size="mini" @click="() => append(node,data)">
           </span>
             <span class="iconfont icon-edit-square" v-show="data.parentId!=-1" type="text" size="mini" @click="() => update(data)">
           </span>
@@ -55,7 +56,6 @@
     <addCaseDialog @onClose="onClose" :show="isShow" :ext="ext1"></addCaseDialog>
     <updateCaseDialog @onClose_1="onClose_1" :show="isShow_1" :ext="ext1" :key="new Date().getTime()"></updateCaseDialog>
     <delCaseDialog @onClose_2="onClose_2" :show="isShow_2" :ext1="ext1" :ext2="ext2" message="你确认要删除该用例么?"></delCaseDialog>
-
   </div>
 </template>
 <script type="text/javascript">
@@ -69,7 +69,7 @@ import ps from './PlanSelector'
 import mychartDialog from './chart'
 export default {
 
-  components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard,ps},
+  components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard, ps },
   watch: {
     filterText: function(val) {
       this.$refs.tree.filter(val);
@@ -89,7 +89,7 @@ export default {
       isShow: false,
       isShow_1: false,
       isShow_2: false,
-      ext:{},
+      ext: {},
       ext1: {},
       ext2: {}
 
@@ -100,10 +100,22 @@ export default {
     /***
      *****
      **/
-    getMethod(data){
-      if(!data.method)return '';
+    getMethod(data) {
+      if (!data.method) return '';
 
-      return data.method.substring(0,6)
+      var space="&ensp;"
+      if(data.method==='get'||data.method==='put'){
+
+        return  space+space+data.method+space;
+
+      }
+      else if(data.method==='post'){
+         return  space+data.method+space;
+      }
+      else
+         return data.method.substring(0,6);
+
+
 
     },
     handleNodeExpand(data, node, component) {
@@ -127,7 +139,7 @@ export default {
 
     appendFolder(node, data) {
 
-      self=this
+      self = this
 
       console.log("开始新建目录=>" + JSON.stringify(data))
 
@@ -146,16 +158,16 @@ export default {
 
           }
 
-          this.$post("/api/target/add", target,function(){
+          this.$post("/api/target/add", target, function() {
 
             self.$message({
-              'message': '新增目录'+value,
+              'message': '新增目录' + value,
               'type': 'success'
             })
 
             self.$store.commit("updateTreeData")
           })
-       
+
 
         })
         .catch((value) => {
@@ -180,49 +192,49 @@ export default {
 
     },
     update(data) {
-      let self=this
-      var method=data.method
-      if(method){
+      let self = this
+      var method = data.method
+      if (method) {
         this.isShow_1 = true;
-        this.ext1 =data;
-      }else{
+        this.ext1 = data;
+      } else {
 
-          this.$prompt("名称", '编辑目录', {
-          inputPattern: /^[\u4e00-\u9fa5_a-zA-Z0-9]{1,20}$/,
-          inputErrorMessage: '名称不正确'
-        })
-        .then(({ value }) => {
+        this.$prompt("名称", '编辑目录', {
+            inputPattern: /^[\u4e00-\u9fa5_a-zA-Z0-9]{1,20}$/,
+            inputErrorMessage: '名称不正确'
+          })
+          .then(({ value }) => {
 
-          let target = {
-            id:data.id,
-            title: value,
-            accountId: localStorage.getItem("accountId"),
-            parentId: data.parentId,
-            isDir: '1',
-            isDelete:'0'
+            let target = {
+              id: data.id,
+              title: value,
+              accountId: localStorage.getItem("accountId"),
+              parentId: data.parentId,
+              isDir: '1',
+              isDelete: '0'
 
-          }
+            }
 
-          self.$post("/api/target/update", target,function(){
+            self.$post("/api/target/update", target, function() {
 
-            self.$message({
-              'message': '修改目录'+value,
-              'type': 'success'
+              self.$message({
+                'message': '修改目录' + value,
+                'type': 'success'
+              })
+
+              self.$store.commit("updateTreeData")
             })
 
-            self.$store.commit("updateTreeData")
+
           })
-       
+          .catch((value) => {
 
-        })
-        .catch((value) => {
+            self.$message({
+              type: 'error',
+              message: '修改目录失败=>' + value
+            })
 
-          self.$message({
-            type: 'error',
-            message: '修改目录失败=>' + value
           })
-
-        })
 
       }
 
@@ -231,7 +243,7 @@ export default {
     },
     remove(node, data) {
 
-      console.log("准备删除 "+JSON.stringify(data))
+      console.log("准备删除 " + JSON.stringify(data))
 
       this.isShow_2 = true
       this.ext1 = data
@@ -246,14 +258,14 @@ export default {
 
     },
     box(node, data) {
-      this.ext=data
-      let next=function(res){
-        const count=res.data.data
-        console.log("current plan size=>"+count)
+      this.ext = data
+      let next = function(res) {
+        const count = res.data.data
+        console.log("current plan size=>" + count)
 
       }
-      this.$get("/api/plan/queryCount",{},next)
-      this.$refs.planSelector.isShow=true
+      this.$get("/api/plan/queryCount", {}, next)
+      this.$refs.planSelector.isShow = true
 
     },
     mouseover(node, data) {
@@ -329,6 +341,12 @@ export default {
 
 .folder-class {
   color: #EEB422;
+}
+
+.method {
+  padding:0;
+  font-family: "Helvetica Neue";
+  font-size:10px;
 }
 
 .tool {

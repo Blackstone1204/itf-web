@@ -27,8 +27,12 @@
       </div>
     </el-dialog>
 
-    <mychartDialog :show="isShow_1"></mychartDialog>
+    <mychartDialog :show="isShow_1" @close="listenClose"></mychartDialog>
+
+   <!--    <div class="echarts" id="echarts-dom"></div> -->
   </div>
+
+
 </template>
 <script type="text/javascript">
 import MyPlan from './MyPlan'
@@ -45,6 +49,10 @@ export default {
   },
 
   methods: {
+    listenClose(){
+      this.isShow_1=false;
+
+    },
     submit() {
       self = this
 

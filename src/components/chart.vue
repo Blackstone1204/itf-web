@@ -1,71 +1,90 @@
 <template>
-
+<!--     <div> -->
   <el-dialog title="使用分析" :visible.sync="isShow" :before-close="close">
-    <div class="echarts" id="echarts-dom"></div>
-  
+    <div class="echarts" id="e"></div>
+
   </el-dialog>
 
+<!-- </div> -->
 </template>
-
 <script>
-    import echarts from 'echarts'
+import echarts from 'echarts'
 
-    export default {
-        name: 'echarts',
-        props:{
-            show:Boolean
-        },
-        data() {
-            return {
-                isShow:false
-            }
-        },
-        methods:{
-            close(){
-
-            }
-        },
-        mounted() {
-
-            setTimeout(function(){
-            let $echartsDOM = document.getElementById('echarts-dom')
-            let myEcharts = echarts.init($echartsDOM)
-            let option = {
-                title: {
-                    text: 'ECharts 入门示例'
-                },
-                tooltip: {},
-                legend: {
-                    data: ['销量']
-                },
-                xAxis: {
-                    data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-                },
-                yAxis: {},
-                series: [{
-                    name: '销量',
-                    type: 'bar',
-                    data: [5, 20, 36, 10, 10, 20]
-                }]
-            }
-            myEcharts.setOption(option)
-
-
-        },2000)
-
-
-        },
-        watch:{
-            show:function(){
-                this.isShow=this.show
-            }
-        }
+export default {
+  name: 'echarts',
+  props: {
+    show: Boolean
+  },
+  data() {
+    return {
+      isShow: false
     }
+  },
+  methods: {
+    close() {
+      this.isShow = false
+      this.$emit("close")
+
+    },
+    draw(){
+
+        this.$nextTick(function(){
+
+              let e = document.getElementById("e")
+
+      console.log("dom=>"+e);
+
+      if(null===e)return;
+
+      
+
+      let myEcharts = echarts.init(e)
+      let option = {
+        title: {
+          text: 'ECharts 入门示例'
+        },
+        tooltip: {},
+        legend: {
+          data: ['销量']
+        },
+        xAxis: {
+          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+        },
+        yAxis: {},
+        series: [{
+          name: '销量',
+          type: 'bar',
+          data: [5, 20, 36, 10, 10, 20]
+        }]
+      }
+      myEcharts.setOption(option)
+
+    
+        })
+
+
+
+    }
+
+
+  },
+  watch: {
+    show: function() {
+      this.isShow = this.show
+     // this.draw()
+    },
+    isShow:function(){
+        console.log("isShow=>"+this.isShow)
+        if(this.isShow==true)this.draw();
+    }
+  }
+}
+
 </script>
-
 <style scoped>
-    .echarts {
-        width: 300px;
-        height:300px;
-    }
+.echarts {
+  width: 600px;
+  height: 300px;
+}
+
 </style>
