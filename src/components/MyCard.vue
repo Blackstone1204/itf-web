@@ -3,6 +3,7 @@
     <!-- <el-scrollbar class="el-scrollbar"> -->
     <el-card class="box-card" v-for="plan in plans " shadow="hover" :key="plan.name">
       <div slot="header" class="clearfix">
+        <span class="plan_name">计划_{{plan.name}}</span>
         <span>
           <span class="pass">pass:4</span><span class="error">error:5</span><span class="total">total:9</span>
         </span>
@@ -11,7 +12,6 @@
         <el-progress type='circle' :percentage='35' color='#67c23a'></el-progress>
       </div>
       <div class="bottom">
-        <span class="plan_name">计划_{{plan.name}}</span>
         <span @click="del" class="plan-icon iconfont icon-delete" style="float: right;margin-right: 5px;"></span>
         <span @click='update' class="plan-icon iconfont icon-edit-square" style="float: right;margin-right: 5px;"></span>
         <span @click='view' class="plan-icon iconfont icon-linechart" style="float: right;margin-right: 5px;"></span>
@@ -28,6 +28,7 @@
     </el-dialog>
 
     <mychartDialog :show="isShow_1" @close="listenClose"></mychartDialog>
+    <RunView :show="isShow_2" @close="listenClose2"></RunView>
 
    <!--    <div class="echarts" id="echarts-dom"></div> -->
   </div>
@@ -37,12 +38,14 @@
 <script type="text/javascript">
 import MyPlan from './MyPlan'
 import mychartDialog from './chart'
+import RunView from './RunView'
 export default {
-  components: { MyPlan,mychartDialog },
+  components: { MyPlan,mychartDialog,RunView},
   data() {
     return {
       isShow: false,
       isShow_1:false,
+      isShow_2:false,
       plans: []
     }
 
@@ -51,6 +54,10 @@ export default {
   methods: {
     listenClose(){
       this.isShow_1=false;
+
+    },
+    listenClose2(){
+      this.isShow_2=false
 
     },
     submit() {
@@ -81,6 +88,10 @@ export default {
 
     },
     run() {
+
+      console.log("打开runview")
+
+      this.isShow_2=true;
 
     },
     view() {
@@ -142,7 +153,7 @@ export default {
 
 .plan-icon:hover {
   color: #67C23A;
-  font-weight: bold;
+
 }
 
 .pass {

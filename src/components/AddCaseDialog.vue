@@ -26,7 +26,7 @@
     <div slot="footer" class="dialog-footer">
       <el-button @click="cancle">取 消</el-button>
       <el-button type="primary" @click="submit">确 定</el-button>
-      <el-button type="primary" @click="reset">重 置</el-button>
+      <el-button type="primary" @click="test">测 试</el-button>
     </div>
   </el-dialog>
 </template>
@@ -207,6 +207,9 @@ export default {
       this.$emit("onClose", this.isShow)
       this.clearText()
 
+
+    },
+    test(){
 
     },
     reset() {

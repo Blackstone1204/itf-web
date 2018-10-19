@@ -9,7 +9,7 @@
           <el-input placeholder="搜索用例" v-model="filterText" size='mini'>
           </el-input>
           <el-tree node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
-            <span class="custom-tree-node " slot-scope="{ node, data }" @mouseover="mouseover(node,data)">
+            <span v-if="counter++" class="custom-tree-node " slot-scope="{ node, data }"  @mouseover="mouseover(node,data,counter)">
 
             <!-- <span v-if="data.method==''||data.method==null" class="iconfont icon-folder-fill" ></span> -->
             <span  class='method' :class="{
@@ -22,7 +22,7 @@
             }" v-html="getMethod(data)">
 
           </span>
-            <span style="padding:0">{{node.label}}</span>
+            <span style="padding:0;size:17px;">{{node.label}}</span>
             <span class="tool">
           <span class="iconfont icon-folder-add"
             type="text"
@@ -78,6 +78,7 @@ export default {
   },
   data: function() {
     return {
+      counter:0,
       h: '200px',
       filterText: "",
 
@@ -268,9 +269,14 @@ export default {
       this.$refs.planSelector.isShow = true
 
     },
-    mouseover(node, data) {
+    mouseover(node, data,index) {
       console.log("mouseover")
-      // document.querySelector("tool").style.display = ""
+      console.log(node)
+      console.log(data)
+      console.log("index="+index)
+
+      document.getElementsByClassName("tool")[index].style.display="block";
+
     },
     /***
      ****
@@ -301,7 +307,11 @@ export default {
 
     this.$nextTick(() => {
 
-      document.querySelector("canvas").style['display'] = 'none'
+      document.querySelector("canvas").style['display'] = 'none';
+
+      var set=document.querySelector(".custom-tree-node");
+      console.log("set is...")
+      console.log(set)
       // document.querySelector("#app").style['background-color']='#EDEDED'
 
     })
@@ -346,18 +356,20 @@ export default {
 .method {
   padding:0;
   font-family: "Helvetica Neue";
-  font-size:10px;
+  font-size:12px;
 }
 
 .tool {
   margin-left: 10px;
   color: #909399;
   float: right;
-  /*  display: none;*/
+  display: none;
 }
+
 
 .icon-folder-fill:before {
   color: #EEB422;
+  font-size: 20px;
 }
 
 </style>
