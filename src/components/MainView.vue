@@ -9,7 +9,7 @@
           <el-input placeholder="搜索用例" v-model="filterText" size='mini'>
           </el-input>
           <el-tree node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
-            <span v-if="counter++" class="custom-tree-node " slot-scope="{ node, data }"  @mouseover="mouseover(node,data,counter)">
+            <span class="custom-tree-node " slot-scope="{ node, data }">
 
             <!-- <span v-if="data.method==''||data.method==null" class="iconfont icon-folder-fill" ></span> -->
             <span  class='method' :class="{
@@ -78,7 +78,7 @@ export default {
   },
   data: function() {
     return {
-      counter:0,
+
       h: '200px',
       filterText: "",
 
@@ -269,13 +269,47 @@ export default {
       this.$refs.planSelector.isShow = true
 
     },
-    mouseover(node, data,index) {
-      console.log("mouseover")
-      console.log(node)
-      console.log(data)
-      console.log("index="+index)
+    addMouseEvent(target){
 
-      document.getElementsByClassName("tool")[index].style.display="block";
+      this.addMouseover(target)
+      this.addMouseout(target)
+
+
+
+    },
+    addMouseover(target) {
+
+      var children=target.children
+
+      for(var i=0;i<children.length;i++){
+        var item=children[i]
+        if(item.className=='tool')
+          item.onmouseover=function(){
+            item.style.display="block"
+
+          }
+
+
+
+      }
+
+    },
+    addMouseout(target){
+
+      var children=target.children
+
+      for(var i=0;i<children.length;i++){
+        var item=children[i]
+        if(item.className=='tool')
+          item.onmouseout=function(){
+              item.style.display="none"
+
+          }
+        
+
+
+      }
+
 
     },
     /***
@@ -298,21 +332,32 @@ export default {
   },
   mounted: function() {
 
-    console.log("mainView.vue page mounted")
+    var self=this
 
+    console.log("mainView mounted")
     // let loadingInstance1 = Loading.service({ fullscreen: true });
 
     this.$store.commit("updateTreeData")
-    //停止特效
+   
+    //
+    //节点挂在悬浮事件
+    setTimeout(function(){
 
-    this.$nextTick(() => {
+      console.log("测试mouseover!")
+      var nodes=document.getElementsByClassName("el-tree-node__content")
+      console.log(nodes)
+      console.log("size="+nodes.length)
+
+      self.addMouseEvent(nodes)
+      
+
+    },100)
+
+ //停止特效
+    this.$nextTick(function(){
 
       document.querySelector("canvas").style['display'] = 'none';
 
-      var set=document.querySelector(".custom-tree-node");
-      console.log("set is...")
-      console.log(set)
-      // document.querySelector("#app").style['background-color']='#EDEDED'
 
     })
 
