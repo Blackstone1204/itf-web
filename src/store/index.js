@@ -57,6 +57,13 @@ let store = new Vuex.Store({
     addTreeExpandKeys(state,key){
 
       console.log("展开节点")
+
+      //
+
+      if(key=='1'){
+        console.log("添加过滤 key= "+key)
+        return
+      }
       state.treeInfo.expandkeys.push(key)
 
       console.log("add expand key->"+state.treeInfo.expandkeys)
@@ -64,6 +71,8 @@ let store = new Vuex.Store({
     },
     removeTreeExpandKeys(state,key){
         console.log("关闭节点")
+        if(key=='1')return;
+
         const index=state.treeInfo.expandkeys.indexOf(key)
         console.log("index->"+index)
         if(index>-1){

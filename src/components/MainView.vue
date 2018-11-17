@@ -9,11 +9,14 @@
           <el-input placeholder="搜索用例" v-model="filterText" size='mini'>
           </el-input>
           <el-tree node-key="id" @node-expand="handleNodeExpand" ref="tree" :data="$store.state.treeInfo.treedata" :props="props" :expand-on-click-node="false" :filter-node-method="filterNode" :default-expanded-keys="$store.state.treeInfo.expandkeys" @node-collapse="handleNodeCollapse">
-            <span class="custom-tree-node " slot-scope="{ node, data }">
+            <span class="custom-tree-node " slot-scope="{ node, data }" @mouseenter="mouseenter" @mouseleave="mouseleave">
 
             <!-- <span v-if="data.method==''||data.method==null" class="iconfont icon-folder-fill" ></span> -->
-            <span  class='method' :class="{
-            'iconfont icon-folder-fill':data.method==''||data.method==null,
+            <span class='method' :class="{
+
+            'iconfont icon-folder-fill': isDirCollapse(data),
+            'iconfont icon-folder-open-fill':isDirExpand(data),
+            'iconfont icon-appstore':data.id=='1',
             // 'folder-class':data.isDir=='1',
             'get-class':data.method=='get',
             'post-class':data.method=='post',
@@ -42,11 +45,11 @@
             Delete
           </el-button> -->
             <span class="iconfont icon-delete" v-show="data.parentId!=-1" type="text" size="mini" @click="() => remove(node, data)"></span>
-            <span class="iconfont icon-check" type="text" size="mini" @click="() => box(node, data)"></span>
-            <ps key="planSelector" ref='planSelector' :ext="ext"></ps>
+            <span class="iconfont icon-share" type="text" size="mini" @click="() => box(node, data)"></span>
             </span>
             </span>
           </el-tree>
+          <ps key="planSelector" ref='planSelector' :ext="ext"></ps>
         </el-aside>
         <el-main :style="{height:h}" style="padding: 0;margin-top:5px;">
           <myCard></myCard>
@@ -67,6 +70,7 @@ import myCard from './MyCard'
 import { Loading } from 'element-ui';
 import ps from './PlanSelector'
 import mychartDialog from './chart'
+
 export default {
 
   components: { info, addCaseDialog, updateCaseDialog, delCaseDialog, myCard, ps },
@@ -104,17 +108,52 @@ export default {
     getMethod(data) {
       if (!data.method) return '';
 
-      var space="&ensp;"
-      if(data.method==='get'||data.method==='put'){
+      var space = "&ensp;"
+      if (data.method === 'get' || data.method === 'put') {
 
-        return  space+space+data.method+space;
+        return space + space + data.method + space;
 
-      }
-      else if(data.method==='post'){
-         return  space+data.method+space;
-      }
-      else
-         return data.method.substring(0,6);
+      } else if (data.method === 'post') {
+        return space + data.method + space;
+      } else
+        return data.method.substring(0, 6);
+
+
+
+    },
+    isDirExpand(data){
+      var expandkeys=this.$store.state.treeInfo.expandkeys;
+      //console.log("keys=>"+JSON.stringify(expandkeys))
+
+      var isDir=(data.method==null)?true:false;
+      //console.log("isDir="+isDir)
+      if(!isDir)return false;
+
+      var isExpand=expandkeys.indexOf(data.id)>-1;
+     // console.log("isExpand="+isExpand)
+
+      if(isExpand)return true;
+      else return false;
+
+      
+
+
+    },
+
+    isDirCollapse(data){
+
+      var expandkeys=this.$store.state.treeInfo.expandkeys;
+      //console.log("keys=>"+JSON.stringify(expandkeys))
+
+      var isDir=(data.method==null)?true:false;
+      //console.log("isDir="+isDir)
+      if(!isDir)return false;
+
+      var isExpand=expandkeys.indexOf(data.id)>-1;
+      //console.log("isExpand="+isExpand)
+
+      if(isExpand)return false;
+      else return true;
 
 
 
@@ -167,7 +206,12 @@ export default {
             })
 
             self.$store.commit("updateTreeData")
+
           })
+
+
+
+
 
 
         })
@@ -189,6 +233,8 @@ export default {
 
       this.isShow = true
       this.ext1 = data
+
+
 
 
     },
@@ -259,6 +305,10 @@ export default {
 
     },
     box(node, data) {
+
+      console.log(JSON.stringify(data))
+
+
       this.ext = data
       let next = function(res) {
         const count = res.data.data
@@ -269,47 +319,47 @@ export default {
       this.$refs.planSelector.isShow = true
 
     },
-    addMouseEvent(target){
-
-      this.addMouseover(target)
-      this.addMouseout(target)
 
 
+    mouseenter(e) {
 
-    },
-    addMouseover(target) {
+      //console.log("custom-tree-node mouseover")
+      //console.log(e.target.className)
 
-      var children=target.children
+      for (var j = 0; j < e.target.children.length; j++) {
+        var toolItem = e.target.children[j]
 
-      for(var i=0;i<children.length;i++){
-        var item=children[i]
-        if(item.className=='tool')
-          item.onmouseover=function(){
-            item.style.display="block"
+        //
 
-          }
+        if (toolItem.className === 'tool') {
+
+          this.toolToggle(toolItem, 'inline')
 
 
+        }
 
       }
 
     },
-    addMouseout(target){
+    mouseleave(e) {
+      //console.log("custom-tree-node mouseout")
+      //console.log(e.target.className)
 
-      var children=target.children
+      for (var j = 0; j < e.target.children.length; j++) {
+        var toolItem = e.target.children[j]
 
-      for(var i=0;i<children.length;i++){
-        var item=children[i]
-        if(item.className=='tool')
-          item.onmouseout=function(){
-              item.style.display="none"
+        if (toolItem.className === 'tool') {
 
-          }
-        
+          this.toolToggle(toolItem, 'none')
 
+        }
 
       }
 
+    },
+    toolToggle(tool, displayCss) {
+      //console.log("tool display=>" + displayCss)
+      tool.style.display = displayCss
 
     },
     /***
@@ -332,29 +382,28 @@ export default {
   },
   mounted: function() {
 
-    var self=this
+    var self = this
 
     console.log("mainView mounted")
     // let loadingInstance1 = Loading.service({ fullscreen: true });
 
     this.$store.commit("updateTreeData")
-   
+
     //
     //节点挂在悬浮事件
-    setTimeout(function(){
+    // setTimeout(function() {
 
-      console.log("测试mouseover!")
-      var nodes=document.getElementsByClassName("el-tree-node__content")
-      console.log(nodes)
-      console.log("size="+nodes.length)
+    //   console.log("测试mouseover!");
+    //   self.addMouseEvent();
 
-      self.addMouseEvent(nodes)
-      
 
-    },100)
 
- //停止特效
-    this.$nextTick(function(){
+
+
+    // }, 5000)
+
+    //停止特效
+    this.$nextTick(function() {
 
       document.querySelector("canvas").style['display'] = 'none';
 
@@ -399,22 +448,37 @@ export default {
 }
 
 .method {
-  padding:0;
+  padding: 0;
   font-family: "Helvetica Neue";
-  font-size:12px;
+  font-size: 12px;
 }
 
 .tool {
   margin-left: 10px;
   color: #909399;
-  float: right;
+  /*  float: right;*/
   display: none;
+  pointer-events: none;
+}
+
+.iconfont {
+  pointer-events: auto;
 }
 
 
 .icon-folder-fill:before {
   color: #EEB422;
-  font-size: 20px;
+  font-size: 15px;
+}
+
+.icon-folder-open-fill:before{
+  color: #EEB422;
+  font-size: 15px;
+
+}
+
+.custom-tree-node {
+  width: 100%;
 }
 
 </style>

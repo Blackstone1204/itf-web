@@ -5,7 +5,7 @@
       <div slot="header" class="clearfix">
         <span class="plan_name">计划_{{plan.name}}</span>
         <span>
-          <span class="pass">pass:4</span><span class="error">error:5</span><span class="total">total:9</span>
+          <span class="pass">pass:4</span><span class="error">error:5</span><span class="total">total:9</span><span class="skip">skip:0</span>
         </span>
       </div>
       <div>
@@ -167,6 +167,10 @@ export default {
 
 .error {
   color: #F56C6C;
+  margin-left: 10px;
+}
+.skip{
+  color:#909399;
   margin-left: 10px;
 }
 

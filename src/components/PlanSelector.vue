@@ -23,7 +23,7 @@ export default {
   },
   data() {
     return {
-      isShow: false,
+      isShow:false,
       options: [],
       value: ''
 
@@ -81,6 +81,10 @@ export default {
 
 
       })
+
+      console.log("计划=>"+JSON.stringify(self.options))
+
+
 
     }
     let a = []
