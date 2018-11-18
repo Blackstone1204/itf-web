@@ -84,7 +84,7 @@ export default {
   },
   mounted:function(){
    console.log("login.vue page mounted")
-   document.querySelector("canvas").style['display']=''
+  
 
 
    // this.$nextTick(()=>{
@@ -100,6 +100,11 @@ export default {
    document.getElementById("loginForm").style.width=formWidth+'px'
    document.getElementById("loginForm").style['left']=leftW+'px'
    document.getElementById("loginForm").style['top']=leftH-20+'px'
+
+    document.querySelector("canvas").style['display']='block'
+  },
+  updated:function(){
+    console.log("login page updated!")
   }
 
 }
